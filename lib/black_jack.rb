@@ -3,8 +3,9 @@ require_relative 'Ask'
 
 class BlackJack
   include Ask
+  
   attr_reader :card_player, :card_machine, :player_points, :machine_points, :golden_point_player, :golden_point_machine, 
-                :pack_parity, :points, :continue_game, :distribution
+                :pack_parity, :continue_game, :distribution
 
   def initialize
     @player_points = 0
@@ -37,8 +38,8 @@ class BlackJack
   private  
               
   def perform_first_hand_of_cards
-    distribution_card_player
-    distribution_card_machine
+    distribution_card_player(get_a_random_number)
+    distribution_card_machine(get_a_random_number)
   end
 
   def perform_the_remaining_cards_are_dealt
@@ -59,19 +60,19 @@ class BlackJack
       to_continue_a_game?
     end
     
-    distribution_card_machine if continue_game == true || machine_points <= player_points
+    distribution_card_machine(get_a_random_number) if continue_game == true || machine_points <= player_points
   end  
   
   def to_continue_a_game?
     if distribution == "yes" || distribution == "Yes"
-      distribution_card_player
+      distribution_card_player(get_a_random_number)
     else
       @continue_game = false
     end 
   end
   
-  def distribution_card_player
-    @card_player = get_a_random_number    
+  def distribution_card_player(points)
+    @card_player = points    
     @player_points += pack_parity[card_player]
     
     check_golden_point(card_player)    
@@ -80,10 +81,10 @@ class BlackJack
     report_the_number_of_points_at_the_player(machine_points, player_points)
   end
 
-  def distribution_card_machine
-    puts "\nТеперь моя раздача:\n\n"
+  def distribution_card_machine(points)
+    report_card_distribution_machine
 
-    @card_machine = get_a_random_number
+    @card_machine = points
     @machine_points += pack_parity[card_machine]
     
     check_golden_point(card_machine)
