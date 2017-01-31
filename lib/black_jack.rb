@@ -1,4 +1,11 @@
-﻿class BlackJack
+﻿require_relative 'printer_results'
+require_relative 'Ask'
+
+class BlackJack
+  include Ask
+  attr_reader :card_player, :card_machine, :player_points, :machine_points, :golden_point_player, :golden_point_machine, 
+                :pack_parity, :points, :continue_game, :distribution
+
   def initialize
     @player_points = 0
     @machine_points = 0
@@ -21,15 +28,13 @@
   end
 
   def game
+    welcome_player  
     perform_first_hand_of_cards
     perform_the_remaining_cards_are_dealt
-    result_games
+    inform_the_result_of_the_game
   end
 
-  private
-  
-  attr_reader :card_player, :card_machine, :player_points, :machine_points, :golden_point_player, :golden_point_machine, 
-                :pack_parity, :points, :continue_game, :distribution
+  private  
               
   def perform_first_hand_of_cards
     distribution_card_player
@@ -39,9 +44,9 @@
   def perform_the_remaining_cards_are_dealt
     while check_the_condition_of_the_continuation_of_the_game
       gameplay
-    end
-
-    report_on_completion_of_the_game
+    end   
+    
+    report_on_completion_of_the_game(machine_points, player_points)
   end
   
   def check_the_condition_of_the_continuation_of_the_game
@@ -55,16 +60,7 @@
     end
     
     distribution_card_machine if continue_game == true || machine_points <= player_points
-  end
-  
-  def report_on_completion_of_the_game
-    puts "\nИгра окончена! У меня #{machine_points} очк#{ending_word(machine_points)}, а у тебя #{player_points} очк#{ending_word(player_points)}.\n\n"
-  end
-  
-  def get_the_answer_player
-    puts "\nЖелаешь еще одну карту? Напиши 'Yes' или 'No'.\n\n"
-    @distribution = gets.chomp
-  end
+  end  
   
   def to_continue_a_game?
     if distribution == "yes" || distribution == "Yes"
@@ -81,7 +77,7 @@
     check_golden_point(card_player)    
     remove_the_precipitated_card(card_player)
     
-    puts "\nТебе выпала вот эта карта #{color_card(card_player)}, у тебя #{player_points} очк#{ending_word(player_points)}.\n"
+    report_the_number_of_points_at_the_player(machine_points, player_points)
   end
 
   def distribution_card_machine
@@ -93,9 +89,9 @@
     check_golden_point(card_machine)
     remove_the_precipitated_card(card_machine)
     
-    puts "Мне выпала вот эта карта #{color_card(card_machine)}, у меня #{machine_points} очк#{ending_word(machine_points)}.\n"
+    report_the_number_of_points_at_the_machine(machine_points, player_points)
   end
-  
+    
   def get_a_random_number
     pack_parity.keys[rand(pack_parity.size)]
   end
@@ -116,74 +112,13 @@
     color_card = card.chars
     color_card.pop
     color_card.join + @card_suit[card.chars.last].chr
-  end
+  end  
   
-  def ending_word(points)
-    if points == 21 || points == 31
-      "о"
-    elsif points >= 2 && points <= 4 || points >= 22 && points <= 24
-      "а"
-    elsif points >= 5 && points <= 20 || points >= 25 && points <= 30
-      "ов"
-    end
-  end
-
-  def result_games
-    case
-    when golden_point_player_win
-      puts "У тебя 'золотое очко'. Ты победитель!"
-    when golden_point_machine_win
-      puts "У меня 'золотое очко'. Сегодня победа за мной!"
-    when black_jack_player
-      puts "Ты победитель!"
-    when black_jack_machine
-      puts "Сегодня победа за мной!"
-    when draw
-      puts "У нас с тобой ничья!"
-    when bust_machine
-      puts "Ты победитель!"
-    when bust_player
-      puts "Сегодня победа за мной!"
-    when both_gleaning
-      if player_points > machine_points
-        puts "Ты победитель!"
-      elsif player_points == machine_points
-        puts "У нас с тобой ничья!"
-      elsif player_points < machine_points
-        puts "Сегодня победа за мной!"
-      end
-    end
-  end
-
-  def golden_point_machine_win
-    machine_points == 22 && @golden_point_machine == 2
-  end
-
-  def golden_point_player_win
-    player_points == 22 && @golden_point_player == 2
-  end
-
-  def black_jack_player
-    player_points == 21 && machine_points != 21
-  end
-
-  def black_jack_machine
-    player_points != 21 && machine_points == 21
-  end
-
-  def bust_player
-    player_points > 21 && machine_points < 21
-  end
-
-  def bust_machine
-    player_points < 21 && machine_points > 21
-  end
-
-  def draw
-    player_points == 21 && machine_points == 21
-  end
-
-  def both_gleaning
-    player_points < 21 && machine_points < 21
+  def inform_the_result_of_the_game
+    printer_results = PrinterResults.new(machine_points, player_points, golden_point_machine, golden_point_player)
+    printer_results.result_games
   end
 end
+
+black_jack = BlackJack.new
+black_jack.game
