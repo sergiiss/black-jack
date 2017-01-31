@@ -1,5 +1,5 @@
 ﻿require_relative 'printer_results'
-require_relative 'Ask'
+require_relative 'ask'
 
 class BlackJack
   include Ask
