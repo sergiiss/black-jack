@@ -1,4 +1,8 @@
+#!/usr/bin/env ruby
+
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
 require 'black_jack'
 
-require 'minitest/autorun'
+black_jack = BlackJack.new
+black_jack.game 

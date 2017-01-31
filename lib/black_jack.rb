@@ -1,11 +1,9 @@
-﻿require_relative 'printer_results'
-require_relative 'ask'
+﻿require_relative 'black_jack/printer_results'
+require_relative 'black_jack/ask'
 
 class BlackJack
-  include Ask
-  
   attr_reader :card_player, :card_machine, :player_points, :machine_points, :golden_point_player, :golden_point_machine, 
-                :pack_parity, :continue_game, :distribution
+                :pack_parity, :continue_game, :distribution, :ask
 
   def initialize
     @player_points = 0
@@ -23,20 +21,18 @@ class BlackJack
       "KC"  => 4, "KD"  => 4, "AS"  => 11, "AH"  => 11, "AC" => 11, "AD" => 11
     }
    
-    @card_suit = {
-      "S" => 6, "H" => 3, "C" => 5, "D" => 4
-    }
+    @ask = Ask.new
   end
 
   def game
-    welcome_player  
+    ask.welcome_player
     perform_first_hand_of_cards
     perform_the_remaining_cards_are_dealt
     inform_the_result_of_the_game
   end
 
-  private  
-              
+  private
+  
   def perform_first_hand_of_cards
     distribution_card_player(get_a_random_number)
     distribution_card_machine(get_a_random_number)
@@ -47,7 +43,7 @@ class BlackJack
       gameplay
     end   
     
-    report_on_completion_of_the_game(machine_points, player_points)
+    ask.report_on_completion_of_the_game(machine_points, player_points)
   end
   
   def check_the_condition_of_the_continuation_of_the_game
@@ -56,7 +52,7 @@ class BlackJack
   
   def gameplay
     if continue_game == true && player_points < 21
-      get_the_answer_player
+      @distribution = ask.get_the_answer_player
       to_continue_a_game?
     end
     
@@ -68,21 +64,21 @@ class BlackJack
       distribution_card_player(get_a_random_number)
     else
       @continue_game = false
-    end 
+    end
   end
   
   def distribution_card_player(points)
-    @card_player = points    
+    @card_player = points
     @player_points += pack_parity[card_player]
     
-    check_golden_point(card_player)    
+    check_golden_point(card_player)
     remove_the_precipitated_card(card_player)
     
-    report_the_number_of_points_at_the_player(machine_points, player_points)
+    ask.report_the_number_of_points_at_the_player(card_player, player_points)
   end
 
   def distribution_card_machine(points)
-    report_card_distribution_machine
+    ask.report_card_distribution_machine
 
     @card_machine = points
     @machine_points += pack_parity[card_machine]
@@ -90,7 +86,7 @@ class BlackJack
     check_golden_point(card_machine)
     remove_the_precipitated_card(card_machine)
     
-    report_the_number_of_points_at_the_machine(machine_points, player_points)
+    ask.report_the_number_of_points_at_the_machine(card_machine, machine_points)
   end
     
   def get_a_random_number
@@ -109,17 +105,8 @@ class BlackJack
     @pack_parity = @pack_parity.delete_if { |key, value| key == card }
   end
   
-  def color_card(card)
-    color_card = card.chars
-    color_card.pop
-    color_card.join + @card_suit[card.chars.last].chr
-  end  
-  
   def inform_the_result_of_the_game
     printer_results = PrinterResults.new(machine_points, player_points, golden_point_machine, golden_point_player)
     printer_results.result_games
   end
 end
-
-black_jack = BlackJack.new
-black_jack.game

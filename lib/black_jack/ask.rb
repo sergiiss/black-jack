@@ -1,4 +1,10 @@
-module Ask
+class Ask
+  def initialize
+    @card_suit = {
+      "S" => 6, "H" => 3, "C" => 5, "D" => 4
+    }
+  end
+
   def welcome_player
     puts "Приветствую тебя, игрок. Как твое имя?\n\n"
     name = gets.chomp
@@ -9,18 +15,18 @@ module Ask
 
   def get_the_answer_player
     puts "\nЖелаешь еще одну карту? Напиши 'Yes' или 'No'.\n\n"
-    @distribution = gets.chomp
+    distribution = gets.chomp
   end
   
   def report_card_distribution_machine
     puts "\nТеперь моя раздача:\n\n"
   end
   
-  def report_the_number_of_points_at_the_player(machine_points, player_points)
+  def report_the_number_of_points_at_the_player(card_player, player_points)
     puts "\nТебе выпала вот эта карта #{color_card(card_player)}, у тебя #{player_points} очк#{ending_word(player_points)}.\n"
   end
   
-  def report_the_number_of_points_at_the_machine(machine_points, player_points)
+  def report_the_number_of_points_at_the_machine(card_machine, machine_points)
     puts "Мне выпала вот эта карта #{color_card(card_machine)}, у меня #{machine_points} очк#{ending_word(machine_points)}.\n"
   end
   
@@ -37,4 +43,10 @@ module Ask
       "ов"
     end
   end
+  
+  def color_card(card)
+    color_card = card.chars
+    color_card.pop
+    color_card.join + @card_suit[card.chars.last].chr
+  end  
 end
