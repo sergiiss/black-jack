@@ -15,22 +15,22 @@ class PrinterResults
     when golden_point_machine_win
       puts "У меня 'золотое очко'. Сегодня победа за мной!"
     when black_jack_player
-      puts "Ты победитель!"
+      puts 'Ты победитель!'
     when black_jack_machine
-      puts "Сегодня победа за мной!"
+      puts 'Сегодня победа за мной!'
     when draw
-      puts "У нас с тобой ничья!"
+      puts 'У нас с тобой ничья!'
     when bust_machine
-      puts "Ты победитель!"
+      puts 'Ты победитель!'
     when bust_player
-      puts "Сегодня победа за мной!"
+      puts 'Сегодня победа за мной!'
     when both_gleaning
       if player_points > machine_points
-        puts "Ты победитель!"
+        puts 'Ты победитель!'
       elsif player_points == machine_points
-        puts "У нас с тобой ничья!"
+        puts 'У нас с тобой ничья!'
       elsif player_points < machine_points
-        puts "Сегодня победа за мной!"
+        puts 'Сегодня победа за мной!'
       end
     end
   end
