@@ -2,7 +2,6 @@
 require 'black_jack/ask'
 require 'black_jack/actions_whis_card_deck'
 
-
 class BlackJack
   attr_reader :player_points, :machine_points, :continue_game, :distribution, :ask, :actions_whis_card_deck
 
