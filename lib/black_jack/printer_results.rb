@@ -2,10 +2,10 @@ class PrinterResults
   attr_reader :machine_points, :player_points, :golden_point_machine, :golden_point_player
 
   def initialize(machine_points, player_points, golden_point_machine, golden_point_player)
-    @machine_points = machine_points
-    @player_points = player_points
-    @golden_point_machine = golden_point_machine
-    @golden_point_player = golden_point_player
+    @machine_points         = machine_points
+    @player_points          = player_points
+    @golden_point_machine   = golden_point_machine
+    @golden_point_player    = golden_point_player
   end
 
   def result_games

@@ -1,27 +1,19 @@
-﻿require_relative 'black_jack/printer_results'
-require_relative 'black_jack/ask'
+﻿require 'black_jack/printer_results'
+require 'black_jack/ask'
+require 'black_jack/actions_whis_card_deck'
+
 
 class BlackJack
-  attr_reader :card_player, :card_machine, :player_points, :machine_points, :golden_point_player, :golden_point_machine,
-                :pack_parity, :continue_game, :distribution, :ask
+  attr_reader :player_points, :machine_points, :continue_game, :distribution, :ask, :actions_whis_card_deck
 
   def initialize
-    @player_points = 0
-    @machine_points = 0
-    @golden_point_player = 0
-    @golden_point_machine = 0
-    @continue_game = true
-    @distribution = "Yes"
+    @player_points          = 0
+    @machine_points         = 0
+    @continue_game          = true
+    @distribution           = "Yes"
 
-    @pack_parity = {
-      '6S'  => 6, '6H'  => 6, '6C'  => 6,  '6D'  => 6,  '7S' => 7,  '7H' => 7, '7C' => 7, '7D' => 7,
-      '8S'  => 8, '8H'  => 8, '8C'  => 8,  '8D'  => 8,  '9S' => 9,  '9H' => 9, '9C' => 9, '9D' => 9,
-      '10S' => 10,'10H' => 10,'10C' => 10, '10D' => 10, 'JS' => 2,  'JH' => 2, 'JC' => 2,
-      'JD'  => 2, 'QS'  => 3, 'QH'  => 3,  'QC'  => 3,  'QD' => 3,  'KS' => 4, 'KH' => 4,
-      'KC'  => 4, 'KD'  => 4, 'AS'  => 11, 'AH'  => 11, 'AC' => 11, 'AD' => 11
-    }
-
-    @ask = Ask.new
+    @ask                    = Ask.new
+    @actions_whis_card_deck = ActionsWhisCardDeck.new
   end
 
   def game
@@ -34,8 +26,8 @@ class BlackJack
   private
 
   def perform_first_hand_of_cards
-    distribution_card_player(get_a_random_number)
-    distribution_card_machine(get_a_random_number)
+    distribution_card_player(actions_whis_card_deck.get_a_random_number)
+    distribution_card_machine(actions_whis_card_deck.get_a_random_number)
   end
 
   def perform_the_remaining_cards_are_dealt
@@ -56,53 +48,43 @@ class BlackJack
       to_continue_a_game?
     end
 
-    distribution_card_machine(get_a_random_number) if continue_game == true || machine_points <= player_points
+    distribution_card_machine(actions_whis_card_deck.get_a_random_number) if continue_game == true || machine_points <= player_points
   end
 
   def to_continue_a_game?
     if distribution == 'yes' || distribution == 'Yes'
-      distribution_card_player(get_a_random_number)
+      distribution_card_player(actions_whis_card_deck.get_a_random_number)
     else
       @continue_game = false
     end
   end
 
-  def distribution_card_player(points)
-    @card_player = points
-    @player_points += pack_parity[card_player]
+  def distribution_card_player(card)
+    @player_points += actions_whis_card_deck.get_cards_points(card)
 
-    check_golden_point(card_player)
-    remove_the_precipitated_card(card_player)
+    actions_whis_card_deck.check_golden_point_player(card)
+    actions_whis_card_deck.remove_the_precipitated_card(card)
 
-    ask.report_the_number_of_points_at_the_player(card_player, player_points)
+    ask.report_the_number_of_points_at_the_player(card, player_points)
   end
 
-  def distribution_card_machine(points)
+  def distribution_card_machine(card)
     ask.report_card_distribution_machine
 
-    @card_machine = points
-    @machine_points += pack_parity[card_machine]
+    @machine_points += actions_whis_card_deck.get_cards_points(card)
 
-    check_golden_point(card_machine)
-    remove_the_precipitated_card(card_machine)
+    actions_whis_card_deck.check_golden_point_machine(card)
+    actions_whis_card_deck.remove_the_precipitated_card(card)
 
-    ask.report_the_number_of_points_at_the_machine(card_machine, machine_points)
+    ask.report_the_number_of_points_at_the_machine(card, machine_points)
   end
 
-  def get_a_random_number
-    pack_parity.keys[rand(pack_parity.size)]
+  def golden_point_machine
+    actions_whis_card_deck.golden_point_machine
   end
 
-  def check_golden_point(card)
-    if card == card_machine
-      @golden_point_machine += 1 if pack_parity[card] == 11
-    else
-      @golden_point_player += 1 if pack_parity[card] == 11
-    end
-  end
-
-  def remove_the_precipitated_card(card)
-    @pack_parity = @pack_parity.delete_if { |key, value| key == card }
+  def golden_point_player
+    actions_whis_card_deck.golden_point_player
   end
 
   def inform_the_result_of_the_game
