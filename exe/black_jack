@@ -4,5 +4,5 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'black_jack'
 
-black_jack = BlackJack.new
-black_jack.game 
+black_jack = BlackJack::GameBlackJack.new
+black_jack.game
